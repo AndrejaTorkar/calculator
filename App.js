@@ -1,4 +1,9 @@
 /*
+GENERAL COMMENTS: 
+* this app is designed to run on mobile phones only, and isn't supporting any other devices.
+* If you want to run it locally (e.g. on Simulator) and the design looks "broken", add a random 
+comment anywhere in the code, save and run again. It should fix the issues.
+
 IMPROVEMENTS: 
 * to the styling: 
 ** the base design is now classic. I added the button for different skins: classic, neon and clean.
