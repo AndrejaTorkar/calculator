@@ -54,32 +54,32 @@ export default function App() {
   const [sinValue, setSinValue] = useState("sin");
   const [cosValue, setCosValue] = useState("cos");
   const [tanValue, setTanValue] = useState("sin");
-  const [cleanValue, setCleanValue] = useState("C");
+
+  const skins = ["CLASSIC", "NEON", "CLEAN"];
 
   const buttonPressed = (value) => {
-    if (["CLASSIC", "NEON", "CLEAN"].includes(value)) {
-      const skins = ["CLASSIC", "NEON", "CLEAN"];
+    /**
+     * Handle all button presses.
+     */
+    if (skins.includes(value)) {
+      // Increment through skins and swithch to the next one
       const current_idx = skins.indexOf(skinValue);
       const next_idx = (current_idx + 1) % skins.length;
       setSkinValue(skins[next_idx]);
     }
 
+    // Switch between degrees and radians
     if (value === "DEG" && degreeValue === "DEG") {
       setDegreeValue("RAD");
     } else if (value === "DEG" && degreeValue === "RAD") {
       setDegreeValue("DEG");
     }
 
+    // Swithc between shift on/off
     if (value === "SHIFT" && shiftValue === "") {
-      setShiftValue("SHIFT");
-      setSinValue("asin");
-      setCosValue("acos");
-      setTanValue("atan");
+      shiftOn();
     } else if (value === "SHIFT" && shiftValue === "SHIFT") {
-      setShiftValue("");
-      setSinValue("sin");
-      setCosValue("cos");
-      setTanValue("tan");
+      shiftOff();
     }
 
     if (operatorValue != "") {
@@ -96,13 +96,23 @@ export default function App() {
       handleImmediateOperator(value);
     } else if (value === "=") {
       calculateEquals();
+      setMemoryValue(null);
+      setReadyToReplace(true);
+      setOperatorValue("");
     }
-
   };
 
+  ///////////////////////////////////////////////////////
+  //////////// HANDLE NUMBERS, OPERATORS ////////////////
+  ///////////////////////////////////////////////////////
+
   const handleNumber = (number) => {
+    /**
+     * Handle any pressed number.
+     */
     if (readyToReplace) {
       setReadyToReplace(false);
+      // RESOURCES: https://www.w3schools.com/jsref/jsref_tostring_number.asp
       return number.toString();
     } else {
       return answerValue + number.toString();
@@ -110,6 +120,10 @@ export default function App() {
   };
 
   const clear = () => {
+    /**
+     * Handle "C" button. Clear answer, memory and operator value and set ready to replace to true.
+     */
+
     setAnswerValue("0");
     setMemoryValue(0);
     setOperatorValue(null);
@@ -117,12 +131,20 @@ export default function App() {
   };
 
   const handleOperator = (operator) => {
+    /**
+     * Handle any oparator that persists in memory, like +, / or *, but not % or inverse.
+     */
     setMemoryValue(parseFloat(answerValue));
     setReadyToReplace(true);
     setOperatorValue(operator);
   };
 
   const handleImmediateOperator = (operator) => {
+    /**
+     * Handle different operators that dosen't persist in memory with the switch statement.
+     * 
+
+     */
     setReadyToReplace(true);
     // RESOURCES: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/switch
     switch (operator) {
@@ -140,6 +162,7 @@ export default function App() {
         setAnswerValue(parseFloat(answerValue) ** 2);
         break;
       case "sin":
+        // handle computation of (a)sin for deg or rad
         let sin_val = 0.0;
         if (shiftValue === "") {
           if (degreeValue === "RAD") {
@@ -159,6 +182,7 @@ export default function App() {
         setAnswerValue(sin_val);
         break;
       case "cos":
+        // handle computation of (a)cos for deg or rad
         let cos_val = 0.0;
         if (shiftValue === "") {
           if (degreeValue === "RAD") {
@@ -178,6 +202,7 @@ export default function App() {
         setAnswerValue(cos_val);
         break;
       case "tan":
+        // handle computation of (a)tan for deg or rad
         let tan_val = 0.0;
         if (shiftValue === "") {
           if (degreeValue === "RAD") {
@@ -201,6 +226,10 @@ export default function App() {
   };
 
   const calculateEquals = () => {
+    /**
+     * Evaluate the complete expression and consider operators that persist in memory
+     * e.g. +, /, - etc. but not % or inverse
+     */
     const previous = parseFloat(memoryValue);
     const current = parseFloat(answerValue);
 
@@ -219,13 +248,16 @@ export default function App() {
         setAnswerValue((previous / current).toString());
         break;
     }
-
-    setMemoryValue(null);
-    setReadyToReplace(true);
-    setOperatorValue("");
   };
 
+  ///////////////////////////////////////////////////////
+  ////////////////// HELPER FUNCTIONS ///////////////////
+  ///////////////////////////////////////////////////////
+
   const getStyles = () => {
+    /**
+     * Calls the correct style, corresponding to the skinValue.
+     */
     switch (skinValue) {
       case "CLASSIC":
         return styles;
@@ -236,9 +268,30 @@ export default function App() {
     }
   };
 
-  ////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////
+  const shiftOn = () => {
+    /**
+     * Changes trig functions values to inverse.
+     */
+    setShiftValue("SHIFT");
+    setSinValue("asin");
+    setCosValue("acos");
+    setTanValue("atan");
+  };
+
+  const shiftOff = () => {
+    /**
+     * Changes trig functions values to regular.
+     */
+    setShiftValue("");
+    setSinValue("sin");
+    setCosValue("cos");
+    setTanValue("tan");
+  };
+
+  ///////////////////////////////////////////////////////
+  ////////////////////// ELEMENTS ///////////////////////
+  ///////////////////////////////////////////////////////
+
   return (
     <SafeAreaView style={getStyles().container}>
       <Image
@@ -246,13 +299,15 @@ export default function App() {
         style={getStyles().backgroundImage}
       />
 
-      {/* ////////////////// SCREEN //////////////////////// */}
+      <View style={getStyles().space}>
+      </View>
+
       <View style={getStyles().main}>
         {/* RESOURCES: https://www.coursera.org/learn/uol-cm3050-mobile-development/lecture/WnjVw/3-107-touchable-elements */}
         <Text style={getStyles().operator_text}>Operator: {operatorValue}</Text>
         {/* RESOURCES: https://stackoverflow.com/questions/1127905/how-can-i-format-an-integer-to-a-specific-length-in-javascript */}
         <Text style={getStyles().results_text}>
-          {parseFloat(answerValue).toFixed(3)}
+          {parseFloat(answerValue).toFixed(4)}
         </Text>
       </View>
 
@@ -265,8 +320,6 @@ export default function App() {
         </Text>
       </View>
 
-
-      {/* ////////////////// MODE BUTTONS ////////////////////// */}
       <View style={[getStyles().row]}>
         <TouchableOpacity
           style={[getStyles().button, getStyles().switch_button]}
@@ -302,8 +355,6 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-
-      {/* ////////////////// ROW 1 ////////////////////// */}
       <View style={getStyles().row}>
         <TouchableOpacity
           style={[getStyles().button, getStyles().sci_button]}
@@ -347,8 +398,6 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-
-      {/* ////////////////// ROW 2 ////////////////////// */}
       <View style={getStyles().row}>
         <TouchableOpacity
           style={[getStyles().button, getStyles().sci_button]}
@@ -398,8 +447,6 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-
-      {/* ////////////////// ROW 3 ////////////////////// */}
       <View style={getStyles().row}>
         <TouchableOpacity
           style={[getStyles().button, getStyles().sci_button]}
@@ -448,8 +495,6 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-
-      {/* ////////////////// ROW 4 ////////////////////// */}
       <View style={getStyles().row}>
         <TouchableOpacity
           style={[getStyles().button, getStyles().sci_button]}
@@ -499,8 +544,6 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-
-      {/* ////////////////// ROW 5 ////////////////////// */}
       <View style={getStyles().row}>
         <TouchableOpacity
           style={[getStyles().button, getStyles().sci_button]}
@@ -550,13 +593,11 @@ export default function App() {
   );
 }
 
-
-////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+////////////////// CLASSIC STYLES /////////////////////
+///////////////////////////////////////////////////////
 
 const styles = StyleSheet.create({
-  // RESOURCES: color pallets: https://www.rapidtables.com/web/css/css-color.html
   container: {
     flex: 1,
     backgroundColor: "black",
@@ -573,6 +614,14 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     opacity: 0,
+  },
+
+  space: {
+    flex: 0.15,
+    alignSelf: "stretch",
+    height: 100,
+    alignItems: "stretch",
+    justifyContent: "space-between",
   },
 
   main: {
@@ -671,13 +720,24 @@ const styles = StyleSheet.create({
   },
 });
 
+///////////////////////////////////////////////////////
+///////////////////// NEON STYLES /////////////////////
+///////////////////////////////////////////////////////
+
 const neon_styles = StyleSheet.create({
-  // RESOURCES: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
   container: {
     flex: 1,
     backgroundColor: "black",
     alignItems: "center",
     justifyContent: "flex-end",
+  },
+
+  space: {
+    flex: 0.15,
+    alignSelf: "stretch",
+    height: 100,
+    alignItems: "stretch",
+    justifyContent: "space-between",
   },
 
   main: {
@@ -794,6 +854,10 @@ const neon_styles = StyleSheet.create({
   },
 });
 
+///////////////////////////////////////////////////////
+//////////////////// CLEAN STLYES /////////////////////
+///////////////////////////////////////////////////////
+
 const clean_styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -802,6 +866,14 @@ const clean_styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
 
+  space: {
+    flex: 0.15,
+    alignSelf: "stretch",
+    height: 100,
+    alignItems: "stretch",
+    justifyContent: "space-between",
+  },
+  
   main: {
     flex: 1,
     alignSelf: "stretch",
