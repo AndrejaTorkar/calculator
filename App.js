@@ -44,9 +44,11 @@ import {
   Image,
 } from "react-native";
 
+// aTorkar started writing this code
 let field_width = Dimensions.get("window").width;
 let field_height = Dimensions.get("window").height;
-
+// aTorkar finished writing this code
+// aTorkar started writing this code
 export default function App() {
   // RESOURCES: https://legacy.reactjs.org/docs/hooks-state.html
   const [answerValue, setAnswerValue] = useState("0");
@@ -123,7 +125,7 @@ export default function App() {
       return answerValue + number.toString();
     }
   };
-
+  // aTorkar finished writing this code
   const clear = () => {
     /**
      * Handle "C" button. Clear answer, memory and operator value and set ready to replace to true.
@@ -143,7 +145,7 @@ export default function App() {
     setReadyToReplace(true);
     setOperatorValue(operator);
   };
-
+  // aTorkar started writing this code
   const handleImmediateOperator = (operator) => {
     /**
      * Handle different operators that dosen't persist in memory with the switch statement.
@@ -229,7 +231,7 @@ export default function App() {
         break;
     }
   };
-
+  // aTorkar finished writing this code
   const calculateEquals = () => {
     /**
      * Evaluate the complete expression and consider operators that persist in memory
@@ -237,7 +239,7 @@ export default function App() {
      */
     const previous = parseFloat(memoryValue);
     const current = parseFloat(answerValue);
-
+    // aTorkar started writing this code
     switch (operatorValue) {
       case "+":
         // RESOURCES: https://www.w3schools.com/jsref/jsref_tostring_number.asp
@@ -258,11 +260,12 @@ export default function App() {
   ///////////////////////////////////////////////////////
   ////////////////// HELPER FUNCTIONS ///////////////////
   ///////////////////////////////////////////////////////
-
+  // aTorkar finished writing this code
   const getStyles = () => {
     /**
      * Calls the correct style, corresponding to the skinValue.
      */
+    // aTorkar started writing this code
     switch (skinValue) {
       case "CLASSIC":
         return styles;
@@ -597,7 +600,7 @@ export default function App() {
     </SafeAreaView>
   );
 }
-
+// aTorkar finished writing this code
 ///////////////////////////////////////////////////////
 ////////////////// CLASSIC STYLES /////////////////////
 ///////////////////////////////////////////////////////
@@ -609,7 +612,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end",
   },
-
+  // aTorkar started writing this code
   backgroundImage: {
     flex: 1,
     resizeMode: "cover",
@@ -985,3 +988,4 @@ const clean_styles = StyleSheet.create({
     opacity: 0.7,
   },
 });
+// aTorkar finished writing this code
